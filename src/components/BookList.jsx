@@ -29,4 +29,50 @@ function BookList({ searchItem }) {
         { id: 19, title: 'The Midnight Library', author: 'Matt Haig', price: 13.99 },
         { id: 20, title: 'Sapiens', author: 'Yuval Noah Harari', price: 18.50 },
     ];
+
+    // To filter the books data
+
+    const filteredBooks = books.filter((book) =>
+        book.title.toLowerCase().includes(searchItem.toLowerCase()) ||
+        book.author.toLowerCase().includes(searchItem.toLowerCase())
+    );
+
+    return (
+
+        <div className="book-list">
+            <AnimatePresence>
+                {filteredBooks.length > 0 ? (
+                    filteredBooks.map((book) => (
+                        <motion.div
+                            key={book.id}
+                            initial={{ opacity: 0, scale: 0.95 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            exit={{ opacity: 0, scale: 0.95 }}
+                            transition={{ duration: 0.3 }}
+                        >
+                            <BookCard book={book} />
+
+                        </motion.div>
+                    ))
+                ) : (
+                    <motion.p
+                        key="no-books"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        style={{ marginTop: '20px', color: '#666' }}
+                    >
+                        No books found 📚
+
+                    </motion.p>
+                )}
+
+            </AnimatePresence>
+
+        </div>
+    );
+
 }
+
+
+export default BookList;
