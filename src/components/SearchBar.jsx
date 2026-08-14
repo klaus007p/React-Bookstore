@@ -1,30 +1,33 @@
 import React from "react";
-
+import { Search, X } from "lucide-react";
 
 const SearchBar = ({ searchItem, onSearchChange }) => {
-    return (
-
-        <div className="search-bar" style={{ margin: '20px 0' }}>
-
-            <input type="text"
-                value={searchItem}
-                onChange={(e) => onSearchChange(e.target.value)}
-                placeholder="🔍 Search books by title or author..."
-                className="search-input"
-                style={{
-                    width: '70%',
-                    maxWidth: '400px',
-                    padding: '10px',
-                    borderRadius: '8px',
-                    border: '1px solid #ccc',
-                    outline: 'none',
-                    transition: '0.3s'
-                }}
-            />
-
-        </div>
-    )
-}
-
+  return (
+    <div className="search-bar-container">
+      <div className="search-input-wrapper">
+        <Search className="search-icon" size={20} />
+        <input
+          type="text"
+          value={searchItem}
+          onChange={(e) => onSearchChange(e.target.value)}
+          placeholder="Search books by title, author, or keyword..."
+          className="search-input"
+          id="book-search-input"
+          aria-label="Search books"
+        />
+        {searchItem && (
+          <button
+            className="search-clear-btn"
+            onClick={() => onSearchChange("")}
+            title="Clear search"
+            aria-label="Clear search"
+          >
+            <X size={18} />
+          </button>
+        )}
+      </div>
+    </div>
+  );
+};
 
 export default SearchBar;
