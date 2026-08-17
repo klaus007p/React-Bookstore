@@ -36,6 +36,7 @@ export const CartProvider = ({ children }) => {
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [quickViewBook, setQuickViewBook] = useState(null);
   const [toast, setToast] = useState(null);
+  const [isPaymentOpen, setIsPaymentOpen] = useState(false);
 
   useEffect(() => {
     localStorage.setItem("bookstore_cart", JSON.stringify(cartItems));
@@ -141,6 +142,8 @@ export const CartProvider = ({ children }) => {
         setQuickViewBook,
         toast,
         showToast,
+        isPaymentOpen,
+        setIsPaymentOpen,
       }}
     >
       {children}

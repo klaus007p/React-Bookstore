@@ -1,6 +1,10 @@
 # 📚 Lumina Books — Modern React E-Commerce Bookstore
 
-**Lumina Books** is a modern, high-performance web application built with **React 19**, **Vite**, **Framer Motion**, and **TailwindCSS**. It features live REST API integration with [dbooks.org](https://www.dbooks.org/api/recent), a slide-out shopping cart drawer, wishlist favorites management, category filtering, price/rating sorting, quick-view modals, and smooth dark/light mode transitions.
+## 📚 Project Summary
+
+**Lumina Books** is a modern, full-stack e-commerce web application for an online bookstore. It's a production-ready React application that demonstrates advanced frontend development practices, state management, real-time API integration, payment processing, and user authentication.
+
+**Live Features:** Real-time book catalog with 1000+ books, shopping cart with checkout, wishlist management, user authentication, Razorpay payment integration, dark/light mode, and responsive design.
 
 ---
 
@@ -42,31 +46,43 @@
 
 ## 📁 Project Structure
 
-```text
-React-Bookstore/
-├── public/                  # Static assets & favicons
-├── src/
-│   ├── assets/              # SVGs and images
-│   ├── components/
-│   │   ├── BookCard.jsx         # Book item card with cover, rating, wishlist & cart actions
-│   │   ├── BookList.jsx         # Live API fetcher, category pills, sorting & grid
-│   │   ├── CartDrawer.jsx       # Slide-out cart drawer with checkout & shipping tracker
-│   │   ├── QuickViewModal.jsx   # Modal popup for inspecting book details & e-book links
-│   │   ├── SearchBar.jsx        # Glassmorphic search input with clear button
-│   │   ├── ThemeToggle.jsx      # Sun/Moon light and dark mode switch
-│   │   └── ToastNotification.jsx# Animated action toast alerts
-│   ├── context/
-│   │   ├── CartContext.jsx      # Global cart, wishlist, toast, and modal state
-│   │   └── ThemeContext.jsx     # Dark/Light theme manager with keyboard shortcut
-│   ├── App.css              # Main design system styles & component layouts
-│   ├── App.jsx              # Application root layout, header, hero banner & footer
-│   ├── index.css            # CSS variables, typography & dark theme tokens
-│   └── main.jsx             # React DOM root entrypoint
-├── index.html               # Preloaded Google Fonts (Outfit & Inter) and SEO tags
-├── package.json             # Project dependencies and npm scripts
-└── vite.config.js           # Vite build configuration
 ```
-
+React-Bookstore/
+├── src/
+│   ├── components/                 # Reusable UI components
+│   │   ├── BookCard.jsx           # Individual book item (card)
+│   │   ├── BookList.jsx           # Grid of books with filtering/sorting
+│   │   ├── CartDrawer.jsx         # Shopping cart drawer (slide-in)
+│   │   ├── QuickViewModal.jsx     # Book details modal
+│   │   ├── SearchBar.jsx          # Search input with clearing
+│   │   ├── AuthModal.jsx          # Login/register modal
+│   │   ├── PaymentModal.jsx       # Razorpay checkout modal
+│   │   ├── ThemeToggle.jsx        # Dark/light mode button
+│   │   └── ToastNotification.jsx  # Floating notifications
+│   │
+│   ├── context/                   # React Context providers
+│   │   ├── CartContext.jsx        # Cart, wishlist, toast state
+│   │   ├── AuthContext.jsx        # User authentication state
+│   │   └── ThemeContext.jsx       # Dark/light theme state
+│   │
+│   ├── lib/
+│   │   └── appwrite.js            # Appwrite client initialization
+│   │
+│   ├── App.jsx                    # Root layout component
+│   ├── App.css                    # Main stylesheet (design system)
+│   ├── index.css                  # Global styles + CSS variables
+│   └── main.jsx                   # React entry point
+│
+├── public/                         # Static assets
+├── index.html                      # HTML template
+├── vite.config.js                 # Vite configuration
+├── package.json                   # Dependencies
+├── .env                           # Environment variables
+├── .gitignore                     # Git ignore rules
+├── .oxlintrc.json                # Linting rules
+├── RAZORPAY_SETUP.md             # Backend integration guide
+└── PROJECT_DOCUMENTATION.md       # This file
+```
 ---
 
 ## 🚀 Getting Started

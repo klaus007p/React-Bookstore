@@ -5,6 +5,7 @@ import { ArrowUpDown, BookX, Heart, RefreshCw, Radio, ChevronLeft, ChevronRight 
 import { useCart } from "../context/CartContext";
 
 // Offline Fallback Books Data (12 Curated Books across Technology, Classics, Science & Business)
+// You can Use Mock or dummy data incase app crashes
 const FALLBACK_BOOKS = [
   {
     id: "1098127463",

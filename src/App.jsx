@@ -6,13 +6,22 @@ import BookList from "./components/BookList";
 import CartDrawer from "./components/CartDrawer";
 import QuickViewModal from "./components/QuickViewModal";
 import ToastNotification from "./components/ToastNotification";
+import AuthModal from "./components/AuthModal";
 import { CartProvider, useCart } from "./context/CartContext";
-import { BookOpen, ShoppingBag, Heart, Sparkles, ShieldCheck, Truck, Headphones } from "lucide-react";
+import { useAuth } from "./context/AuthContext";
+import { BookOpen, ShoppingBag, Heart, Sparkles, ShieldCheck, Truck, Headphones, User, LogOut, ChevronDown } from "lucide-react";
+
+
+// Function To Create the main layout navbar, hero section etc.. 
 
 function MainLayout() {
-  const [searchItem, setSearchItem] = useState("");
+  const [searchItem, setSearchItem] = useState("");  
   const [showWishlistOnly, setShowWishlistOnly] = useState(false);
+  const [isAuthOpen, setIsAuthOpen] = useState(false);  // State to check authentication
+  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+
   const { cartCount, wishlist, setIsCartOpen } = useCart();
+  const { user, logout } = useAuth();  // Function To create login and logout
 
   return (
     <div className="app-container">
@@ -55,6 +64,50 @@ function MainLayout() {
           </button>
 
           <ThemeToggle />
+
+          {/* User Auth Section */}
+          {user ? (
+            <div className="user-menu-wrapper">
+              <button
+                className="user-nav-btn"
+                onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
+                title="Account Menu"
+              >
+                <div className="user-avatar-pill">
+                  {(user.name || user.email || "U")[0].toUpperCase()}
+                </div>
+                <span>{user.name || user.email.split("@")[0]}</span>
+                <ChevronDown size={14} />
+              </button>
+
+              {isUserMenuOpen && (
+                <div className="user-menu-dropdown" onClick={(e) => e.stopPropagation()}>
+                  <div className="user-menu-header">
+                    <strong>{user.name || "Reader Profile"}</strong>
+                    <span>{user.email}</span>
+                  </div>
+                  <button
+                    className="logout-menu-btn"
+                    onClick={() => {
+                      logout();
+                      setIsUserMenuOpen(false);
+                    }}
+                  >
+                    <LogOut size={16} />
+                    <span>Log Out</span>
+                  </button>
+                </div>
+              )}
+            </div>
+          ) : (
+            <button
+              className="user-nav-btn"
+              onClick={() => setIsAuthOpen(true)}
+            >
+              <User size={18} />
+              <span>Log In</span>
+            </button>
+          )}
         </div>
       </header>
 
@@ -141,6 +194,7 @@ function MainLayout() {
       <CartDrawer />
       <QuickViewModal />
       <ToastNotification />
+      <AuthModal isOpen={isAuthOpen} onClose={() => setIsAuthOpen(false)} />
     </div>
   );
 }

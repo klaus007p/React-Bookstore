@@ -1,7 +1,9 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Trash2, Plus, Minus, ShoppingBag, ArrowRight, CheckCircle, Truck } from "lucide-react";
+import { X, Trash2, Plus, Minus, ShoppingBag, ArrowRight, CheckCircle, Truck, CreditCard } from "lucide-react";
 import { useCart } from "../context/CartContext";
+import { useAuth } from "../context/AuthContext";
+import PaymentModal from "./PaymentModal";
 
 const FREE_SHIPPING_THRESHOLD = 50.0;
 
@@ -14,9 +16,15 @@ const CartDrawer = () => {
     updateQuantity,
     clearCart,
     subtotal,
+    isPaymentOpen,
+    setIsPaymentOpen,
+    showToast,
   } = useCart();
+  
+  const { user } = useAuth();
 
   const [checkoutSuccess, setCheckoutSuccess] = useState(false);
+  const [orderId] = useState(() => `LB${Date.now()}${Math.random().toString(36).substr(2, 9).toUpperCase()}`);
 
   const tax = subtotal * 0.08;
   const shipping = subtotal > FREE_SHIPPING_THRESHOLD || subtotal === 0 ? 0 : 4.99;
@@ -25,12 +33,16 @@ const CartDrawer = () => {
   const shippingProgress = Math.min(100, (subtotal / FREE_SHIPPING_THRESHOLD) * 100);
 
   const handleCheckout = () => {
+    if (cartItems.length === 0) return;
+    
     setCheckoutSuccess(true);
+    showToast("Order placed successfully! 🎉", "success");
+    
     setTimeout(() => {
       clearCart();
       setCheckoutSuccess(false);
       setIsCartOpen(false);
-    }, 2500);
+    }, 3500);
   };
 
   return (
@@ -84,11 +96,31 @@ const CartDrawer = () => {
             {/* Cart Content */}
             <div className="cart-body">
               {checkoutSuccess ? (
-                <div className="checkout-success-view">
-                  <CheckCircle size={64} color="#22c55e" className="success-animated-icon" />
-                  <h3>Order Placed Successfully!</h3>
-                  <p>Thank you for buying from Lumina Books. A confirmation email has been sent.</p>
-                </div>
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  className="checkout-success-view"
+                >
+                  <motion.div
+                    animate={{ rotate: [0, 10, -10, 0] }}
+                    transition={{ duration: 0.5, delay: 0.2 }}
+                  >
+                    <CheckCircle size={64} color="#22c55e" className="success-animated-icon" />
+                  </motion.div>
+                  <h3>Order Placed Successfully! ✨</h3>
+                  <p>Thank you for buying from Lumina Books!</p>
+                  <div className="order-details-card">
+                    <div className="detail-row">
+                      <span>Order ID:</span>
+                      <strong>{orderId}</strong>
+                    </div>
+                    <div className="detail-row">
+                      <span>Total Amount:</span>
+                      <strong>${total.toFixed(2)}</strong>
+                    </div>
+                  </div>
+                  <p className="confirmation-text">A confirmation email has been sent to your inbox.</p>
+                </motion.div>
               ) : cartItems.length === 0 ? (
                 <div className="empty-cart-view">
                   <ShoppingBag size={64} className="empty-cart-icon" />
@@ -164,15 +196,47 @@ const CartDrawer = () => {
                   <span className="total-amount">${total.toFixed(2)}</span>
                 </div>
 
-                <button className="checkout-btn" onClick={handleCheckout}>
+                <motion.button
+                  className="checkout-btn"
+                  onClick={handleCheckout}
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  transition={{ type: "spring", stiffness: 400, damping: 17 }}
+                >
                   <span>Proceed to Checkout</span>
                   <ArrowRight size={18} />
-                </button>
+                </motion.button>
+
+                <motion.button
+                  className="pay-now-btn"
+                  onClick={() => {
+                    if (!user) {
+                      alert("Please log in to make a payment");
+                      return;
+                    }
+                    setIsPaymentOpen(true);
+                  }}
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  transition={{ type: "spring", stiffness: 400, damping: 17 }}
+                >
+                  <CreditCard size={18} />
+                  <span>Pay Now with Razorpay</span>
+                </motion.button>
               </div>
             )}
           </motion.div>
         </div>
       )}
+
+      <PaymentModal
+        isOpen={isPaymentOpen}
+        onClose={() => setIsPaymentOpen(false)}
+        amount={subtotal + (subtotal * 0.08) + (subtotal > 50 || subtotal === 0 ? 0 : 4.99)}
+        orderId={orderId}
+        customerEmail={user?.email || "guest@example.com"}
+        customerName={user?.name || "Guest"}
+      />
     </AnimatePresence>
   );
 };
