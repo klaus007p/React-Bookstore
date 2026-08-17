@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { ArrowUpDown, BookX, Heart, RefreshCw, Radio, ChevronLeft, ChevronRight } from "lucide-react";
 import { useCart } from "../context/CartContext";
 
-// Offline Fallback Books Data
+// Offline Fallback Books Data (12 Curated Books across Technology, Classics, Science & Business)
 const FALLBACK_BOOKS = [
   {
     id: "1098127463",
@@ -12,6 +12,7 @@ const FALLBACK_BOOKS = [
     subtitle: "DevSecOps Patterns with AWS",
     author: "BK Sarthak Das, Virginia Chu",
     price: 14.99,
+    originalPrice: 18.99,
     category: "Technology",
     rating: 4.8,
     reviewsCount: 310,
@@ -27,6 +28,7 @@ const FALLBACK_BOOKS = [
     subtitle: "Modern Web Development",
     author: "Dirk Strauss",
     price: 12.50,
+    originalPrice: 16.50,
     category: "Technology",
     rating: 4.7,
     reviewsCount: 220,
@@ -42,6 +44,7 @@ const FALLBACK_BOOKS = [
     subtitle: "Reactive Web Interfaces",
     author: "Ed Freitas",
     price: 11.99,
+    originalPrice: 15.99,
     category: "Technology",
     rating: 4.9,
     reviewsCount: 450,
@@ -57,6 +60,7 @@ const FALLBACK_BOOKS = [
     subtitle: "Distributed Ledgers Explained",
     author: "Manav Gupta",
     price: 16.99,
+    originalPrice: 21.99,
     category: "Business",
     rating: 4.6,
     reviewsCount: 540,
@@ -65,19 +69,147 @@ const FALLBACK_BOOKS = [
     coverUrl: "https://www.dbooks.org/img/books/111954601Xs.jpg",
     url: "https://www.dbooks.org/blockchain-for-dummies-111954601x/",
     description: "A clear, accessible introduction to distributed ledger technology, smart contracts, and cryptographic networks."
+  },
+  {
+    id: "1342",
+    title: "Pride and Prejudice",
+    subtitle: "A Masterpiece of Romantic Fiction",
+    author: "Jane Austen",
+    price: 9.99,
+    originalPrice: 13.99,
+    category: "General Literature",
+    rating: 4.9,
+    reviewsCount: 890,
+    year: 1813,
+    pages: 432,
+    coverUrl: "https://www.gutenberg.org/cache/epub/1342/pg1342.cover.medium.jpg",
+    url: "https://www.gutenberg.org/ebooks/1342",
+    description: "The classic tale of Elizabeth Bennet and Mr. Darcy navigating class, marriage, and pride in 19th-century England."
+  },
+  {
+    id: "84",
+    title: "Frankenstein",
+    subtitle: "The Modern Prometheus",
+    author: "Mary Wollstonecraft Shelley",
+    price: 10.99,
+    originalPrice: 14.99,
+    category: "General Literature",
+    rating: 4.8,
+    reviewsCount: 670,
+    year: 1818,
+    pages: 280,
+    coverUrl: "https://www.gutenberg.org/cache/epub/84/pg84.cover.medium.jpg",
+    url: "https://www.gutenberg.org/ebooks/84",
+    description: "A chilling gothic saga exploring creation, responsibility, ambition, and humanity through Victor Frankenstein and his creature."
+  },
+  {
+    id: "11",
+    title: "Alice's Adventures in Wonderland",
+    subtitle: "Fantasy Classic",
+    author: "Lewis Carroll",
+    price: 8.99,
+    originalPrice: 12.99,
+    category: "General Literature",
+    rating: 4.7,
+    reviewsCount: 520,
+    year: 1865,
+    pages: 200,
+    coverUrl: "https://www.gutenberg.org/cache/epub/11/pg11.cover.medium.jpg",
+    url: "https://www.gutenberg.org/ebooks/11",
+    description: "Tumble down the rabbit hole with Alice into a whimsical world of Mad Hatters, Cheshire Cats, and Queen of Hearts."
+  },
+  {
+    id: "1661",
+    title: "The Adventures of Sherlock Holmes",
+    subtitle: "Classic Mystery Stories",
+    author: "Arthur Conan Doyle",
+    price: 13.49,
+    originalPrice: 17.49,
+    category: "General Literature",
+    rating: 4.9,
+    reviewsCount: 940,
+    year: 1892,
+    pages: 307,
+    coverUrl: "https://www.gutenberg.org/cache/epub/1661/pg1661.cover.medium.jpg",
+    url: "https://www.gutenberg.org/ebooks/1661",
+    description: "Follow the master detective Sherlock Holmes and Dr. Watson as they solve London's most baffling mysteries."
+  },
+  {
+    id: "345",
+    title: "Dracula",
+    subtitle: "Gothic Horror Classic",
+    author: "Bram Stoker",
+    price: 11.49,
+    originalPrice: 15.49,
+    category: "General Literature",
+    rating: 4.8,
+    reviewsCount: 780,
+    year: 1897,
+    pages: 418,
+    coverUrl: "https://www.gutenberg.org/cache/epub/345/pg345.cover.medium.jpg",
+    url: "https://www.gutenberg.org/ebooks/345",
+    description: "The iconic epistolary novel introducing Count Dracula's dark journey from Transylvania to Victorian London."
+  },
+  {
+    id: "2701",
+    title: "Moby Dick; Or, The Whale",
+    subtitle: "Epic Nautical Adventure",
+    author: "Herman Melville",
+    price: 12.99,
+    originalPrice: 16.99,
+    category: "General Literature",
+    rating: 4.6,
+    reviewsCount: 430,
+    year: 1851,
+    pages: 635,
+    coverUrl: "https://www.gutenberg.org/cache/epub/2701/pg2701.cover.medium.jpg",
+    url: "https://www.gutenberg.org/ebooks/2701",
+    description: "Captain Ahab's obsessive quest for revenge against the legendary white whale, Moby Dick."
+  },
+  {
+    id: "1513",
+    title: "Romeo and Juliet",
+    subtitle: "Tragic Masterpiece",
+    author: "William Shakespeare",
+    price: 9.49,
+    originalPrice: 13.49,
+    category: "General Literature",
+    rating: 4.7,
+    reviewsCount: 610,
+    year: 1597,
+    pages: 240,
+    coverUrl: "https://www.gutenberg.org/cache/epub/1513/pg1513.cover.medium.jpg",
+    url: "https://www.gutenberg.org/ebooks/1513",
+    description: "The immortal tragedy of star-crossed lovers from feud-torn Verona."
+  },
+  {
+    id: "1952",
+    title: "The Yellow Wallpaper",
+    subtitle: "Psychological Fiction",
+    author: "Charlotte Perkins Gilman",
+    price: 7.99,
+    originalPrice: 11.99,
+    category: "Science & Math",
+    rating: 4.8,
+    reviewsCount: 390,
+    year: 1892,
+    pages: 120,
+    coverUrl: "https://www.gutenberg.org/cache/epub/1952/pg1952.cover.medium.jpg",
+    url: "https://www.gutenberg.org/ebooks/1952",
+    description: "A haunting feminist classic detailing a woman's psychological confinement and isolation."
   }
 ];
 
 // Infer category from book title & authors
 const inferCategory = (title = "", authors = "") => {
   const text = (title + " " + authors).toLowerCase();
-  if (text.match(/code|aws|asp|svelte|bot|c &|raspberry|cloud|kubernetes|programming|devops|magazine|hackspace/)) {
+  if (text.match(/code|aws|asp|svelte|bot|c &|raspberry|cloud|kubernetes|programming|devops|magazine|hackspace|technology|computer/)) {
     return "Technology";
   }
-  if (text.match(/algebra|mathematics|systems|engineering|modelling|biology/)) {
+  if (text.match(/algebra|mathematics|systems|engineering|modelling|biology|science|physics|psychology/)) {
     return "Science & Math";
   }
-  if (text.match(/investment|debt|pay for play|social media|financing|money|industry|management/)) {
+  if (text.match(/investment|debt|pay for play|social media|financing|money|industry|management|business/)) {
     return "Business";
   }
   return "General Literature";
@@ -116,10 +248,14 @@ function BookList({ searchItem, showWishlistOnly, setShowWishlistOnly }) {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 8; // 8 items per page
 
-  const fetchLiveBooks = async (signal) => {
+  const fetchLiveBooks = async (signal, query = "") => {
     setLoading(true);
     try {
-      const response = await fetch("https://gutendex.com/books/?search=pride", { signal });
+      const endpoint = query.trim()
+        ? `https://gutendex.com/books/?search=${encodeURIComponent(query.trim())}`
+        : `https://gutendex.com/books/`;
+
+      const response = await fetch(endpoint, { signal });
       if (!response.ok) throw new Error("API network response was not ok");
       const data = await response.json();
 
@@ -167,15 +303,21 @@ function BookList({ searchItem, showWishlistOnly, setShowWishlistOnly }) {
       setBooks(FALLBACK_BOOKS);
       setIsLiveApi(false);
     } finally {
-      if (!signal?.aborted) setLoading(false);
+      setLoading(false);
     }
   };
 
   useEffect(() => {
     const controller = new AbortController();
-    fetchLiveBooks(controller.signal);
-    return () => controller.abort();
-  }, []);
+    const timer = setTimeout(() => {
+      fetchLiveBooks(controller.signal, searchItem);
+    }, 350);
+
+    return () => {
+      controller.abort();
+      clearTimeout(timer);
+    };
+  }, [searchItem]);
 
   // Get unique categories dynamically
   const categories = useMemo(() => {
@@ -259,7 +401,7 @@ function BookList({ searchItem, showWishlistOnly, setShowWishlistOnly }) {
           <div className="api-status-badge" title={isLiveApi ? "Connected to Gutendex API" : "Using cached fallback data"}>
             <Radio size={14} className={`status-pulse-icon ${isLiveApi ? "online" : "offline"}`} />
             <span>{isLiveApi ? "Gutendex Live" : "Offline Data"}</span>
-            <button className="refresh-api-btn" onClick={() => fetchLiveBooks()} title="Refresh API data">
+            <button className="refresh-api-btn" onClick={() => fetchLiveBooks(null, searchItem)} title="Refresh API data">
               <RefreshCw size={12} className={loading ? "spin" : ""} />
             </button>
           </div>

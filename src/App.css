@@ -249,7 +249,8 @@
   gap: 3rem;
   padding: 1.25rem 2rem;
   background-color: var(--bg-surface);
-  border-y: 1px solid var(--border-color);
+  border-top: 1px solid var(--border-color);
+  border-bottom: 1px solid var(--border-color);
   flex-wrap: wrap;
 }
 
