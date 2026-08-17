@@ -1,14 +1,23 @@
-import React, { createContext, useContext, useState, useEffect } from "react";
+import React, { createContext, useContext, useState, useEffect, useRef } from "react";
 
 const CartContext = createContext();
 
 export const useCart = () => useContext(CartContext);
 
 export const CartProvider = ({ children }) => {
+  const toastTimerRef = useRef(null);
   const [cartItems, setCartItems] = useState(() => {
     try {
       const saved = localStorage.getItem("bookstore_cart");
-      return saved ? JSON.parse(saved) : [];
+      const parsed = saved ? JSON.parse(saved) : [];
+      if (!Array.isArray(parsed)) return [];
+
+      return parsed.map((item) => ({
+        ...item,
+        book: item?.book
+          ? { ...item.book, id: String(item.book.id) }
+          : item.book,
+      }));
     } catch {
       return [];
     }
@@ -17,7 +26,8 @@ export const CartProvider = ({ children }) => {
   const [wishlist, setWishlist] = useState(() => {
     try {
       const saved = localStorage.getItem("bookstore_wishlist");
-      return saved ? JSON.parse(saved) : [];
+      const parsed = saved ? JSON.parse(saved) : [];
+      return Array.isArray(parsed) ? parsed.map((id) => String(id)) : [];
     } catch {
       return [];
     }
@@ -36,37 +46,45 @@ export const CartProvider = ({ children }) => {
   }, [wishlist]);
 
   const showToast = (message, type = "info") => {
+    if (toastTimerRef.current) {
+      clearTimeout(toastTimerRef.current);
+    }
     setToast({ message, type, id: Date.now() });
-    setTimeout(() => {
+    toastTimerRef.current = setTimeout(() => {
       setToast(null);
     }, 3000);
   };
 
   const addToCart = (book, quantity = 1) => {
+    const normalizedBookId = String(book.id);
+    const normalizedBook = { ...book, id: normalizedBookId };
+
     setCartItems((prev) => {
-      const existing = prev.find((item) => item.book.id === book.id);
+      const existing = prev.find((item) => String(item.book.id) === normalizedBookId);
       if (existing) {
         return prev.map((item) =>
-          item.book.id === book.id
+          String(item.book.id) === normalizedBookId
             ? { ...item, quantity: item.quantity + quantity }
             : item
         );
       }
-      return [...prev, { book, quantity }];
+      return [...prev, { book: normalizedBook, quantity }];
     });
     showToast(`Added "${book.title}" to cart!`, "success");
   };
 
   const removeFromCart = (bookId) => {
-    setCartItems((prev) => prev.filter((item) => item.book.id !== bookId));
+    const normalizedBookId = String(bookId);
+    setCartItems((prev) => prev.filter((item) => String(item.book.id) !== normalizedBookId));
     showToast("Item removed from cart", "info");
   };
 
   const updateQuantity = (bookId, delta) => {
+    const normalizedBookId = String(bookId);
     setCartItems((prev) =>
       prev
         .map((item) => {
-          if (item.book.id === bookId) {
+          if (String(item.book.id) === normalizedBookId) {
             const newQty = item.quantity + delta;
             return newQty > 0 ? { ...item, quantity: newQty } : null;
           }
@@ -81,19 +99,21 @@ export const CartProvider = ({ children }) => {
   };
 
   const toggleWishlist = (book) => {
+    const normalizedBookId = String(book.id);
+
     setWishlist((prev) => {
-      const exists = prev.some((bId) => bId === book.id);
+      const exists = prev.some((bId) => String(bId) === normalizedBookId);
       if (exists) {
         showToast(`Removed "${book.title}" from wishlist`, "info");
-        return prev.filter((bId) => bId !== book.id);
+        return prev.filter((bId) => String(bId) !== normalizedBookId);
       } else {
         showToast(`Added "${book.title}" to wishlist!`, "success");
-        return [...prev, book.id];
+        return [...prev, normalizedBookId];
       }
     });
   };
 
-  const isWishlisted = (bookId) => wishlist.includes(bookId);
+  const isWishlisted = (bookId) => wishlist.includes(String(bookId));
 
   const cartCount = cartItems.reduce((acc, item) => acc + item.quantity, 0);
 

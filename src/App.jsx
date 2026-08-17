@@ -18,7 +18,12 @@ function MainLayout() {
     <div className="app-container">
       {/* Top Glassmorphic Navigation Bar */}
       <header className="navbar">
-        <div className="nav-brand" onClick={() => { setSearchItem(""); setShowWishlistOnly(false); }}>
+        <button
+          type="button"
+          className="nav-brand"
+          onClick={() => { setSearchItem(""); setShowWishlistOnly(false); }}
+          aria-label="Reset filters and return to top"
+        >
           <div className="brand-icon-box">
             <BookOpen size={24} color="#ffffff" />
           </div>
@@ -26,7 +31,7 @@ function MainLayout() {
             <span className="brand-title">Lumina<span className="brand-accent">Books</span></span>
             <span className="brand-tagline">Curated Literature</span>
           </div>
-        </div>
+        </button>
 
         <div className="nav-actions">
           <button
@@ -115,9 +120,9 @@ function MainLayout() {
           <div className="footer-links">
             <div className="footer-col">
               <h4>Quick Links</h4>
-              <a href="#search" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>Top Search</a>
-              <a href="#categories" onClick={() => setShowWishlistOnly(false)}>All Categories</a>
-              <a href="#wishlist" onClick={() => setShowWishlistOnly(true)}>My Favorites</a>
+              <a href="#" onClick={(e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: "smooth" }); }}>Top Search</a>
+              <a href="#" onClick={(e) => { e.preventDefault(); setShowWishlistOnly(false); }}>All Categories</a>
+              <a href="#" onClick={(e) => { e.preventDefault(); setShowWishlistOnly(true); }}>My Favorites</a>
             </div>
             <div className="footer-col">
               <h4>Customer Care</h4>

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo } from "react";
 import BookCard from "./BookCard";
 import { motion, AnimatePresence } from "framer-motion";
-import { Filter, ArrowUpDown, BookX, Heart, RefreshCw, Radio } from "lucide-react";
+import { ArrowUpDown, BookX, Heart, RefreshCw, Radio, ChevronLeft, ChevronRight } from "lucide-react";
 import { useCart } from "../context/CartContext";
 
 // Offline Fallback Books Data
@@ -112,32 +112,49 @@ function BookList({ searchItem, showWishlistOnly, setShowWishlistOnly }) {
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [sortBy, setSortBy] = useState("featured");
 
-  const fetchLiveBooks = async () => {
+  // Pagination State
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 8; // 8 items per page
+
+  const fetchLiveBooks = async (signal) => {
     setLoading(true);
     try {
-      const response = await fetch("https://www.dbooks.org/api/recent");
+      const response = await fetch("https://gutendex.com/books/?search=pride", { signal });
       if (!response.ok) throw new Error("API network response was not ok");
       const data = await response.json();
 
-      if (data.status === "ok" && Array.isArray(data.books)) {
-        const transformed = data.books.map((b) => ({
-          id: b.id,
-          title: b.title,
-          subtitle: b.subtitle,
-          author: b.authors || "Unknown Author",
-          coverUrl: b.image,
-          url: b.url,
-          price: generatePrice(b.id),
-          originalPrice: generatePrice(b.id) + 4,
-          rating: generateRating(b.id),
-          reviewsCount: Math.floor(100 + (parseInt(b.id.substring(0, 4), 10) || 120) % 400),
-          category: inferCategory(b.title, b.authors),
-          description: b.subtitle
-            ? `${b.title}: ${b.subtitle}`
-            : `Discover ${b.title} by ${b.authors || "renowned experts"}. Available for online reading and download.`,
-          year: 2023,
-          pages: 250 + (parseInt(b.id.substring(0, 3), 10) || 50) % 200,
-        }));
+      if (Array.isArray(data.results)) {
+        const transformed = data.results.map((b) => {
+          const authorNames = Array.isArray(b.authors) && b.authors.length
+            ? b.authors.map((a) => a.name).join(", ")
+            : "Unknown Author";
+
+          const coverUrl = b.formats?.["image/jpeg"] || "";
+          const readerUrl =
+            b.formats?.["text/html"] ||
+            b.formats?.["text/html; charset=utf-8"] ||
+            b.formats?.["application/epub+zip"] ||
+            "";
+
+          const idStr = String(b.id);
+
+          return {
+            id: idStr,
+            title: b.title || "Untitled",
+            subtitle: b.summaries?.[0] || "",
+            author: authorNames,
+            coverUrl,
+            url: readerUrl,
+            price: generatePrice(idStr),
+            originalPrice: generatePrice(idStr) + 4,
+            rating: generateRating(idStr),
+            reviewsCount: Math.floor(100 + (parseInt(idStr.slice(0, 4), 10) || 120) % 400),
+            category: inferCategory(b.title, authorNames),
+            description: b.summaries?.[0] || `Discover ${b.title || "this book"} by ${authorNames}.`,
+            year: 2023,
+            pages: 250 + (parseInt(idStr.slice(0, 3), 10) || 50) % 200,
+          };
+        });
 
         setBooks(transformed);
         setIsLiveApi(true);
@@ -145,16 +162,19 @@ function BookList({ searchItem, showWishlistOnly, setShowWishlistOnly }) {
         throw new Error("Invalid API format");
       }
     } catch (error) {
-      console.warn("dbooks.org API fetch failed, using fallback data:", error);
+      if (error?.name === "AbortError") return;
+      console.warn("Gutendex API fetch failed, using fallback data:", error);
       setBooks(FALLBACK_BOOKS);
       setIsLiveApi(false);
     } finally {
-      setLoading(false);
+      if (!signal?.aborted) setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchLiveBooks();
+    const controller = new AbortController();
+    fetchLiveBooks(controller.signal);
+    return () => controller.abort();
   }, []);
 
   // Get unique categories dynamically
@@ -189,9 +209,22 @@ function BookList({ searchItem, showWishlistOnly, setShowWishlistOnly }) {
       });
   }, [books, searchItem, selectedCategory, showWishlistOnly, wishlist, sortBy]);
 
+  // Reset page to 1 whenever filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchItem, selectedCategory, showWishlistOnly, sortBy]);
+
+  // Paginated Subset
+  const totalPages = Math.ceil(filteredBooks.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const paginatedBooks = useMemo(() => {
+    return filteredBooks.slice(startIndex, startIndex + itemsPerPage);
+  }, [filteredBooks, startIndex, itemsPerPage]);
+
   const clearAllFilters = () => {
     setSelectedCategory("All");
     setSortBy("featured");
+    setCurrentPage(1);
     if (setShowWishlistOnly) setShowWishlistOnly(false);
   };
 
@@ -223,10 +256,10 @@ function BookList({ searchItem, showWishlistOnly, setShowWishlistOnly }) {
         </div>
 
         <div className="toolbar-right-controls">
-          <div className="api-status-badge" title={isLiveApi ? "Connected to dbooks.org API" : "Using cached fallback data"}>
+          <div className="api-status-badge" title={isLiveApi ? "Connected to Gutendex API" : "Using cached fallback data"}>
             <Radio size={14} className={`status-pulse-icon ${isLiveApi ? "online" : "offline"}`} />
-            <span>{isLiveApi ? "dbooks API Live" : "Offline Data"}</span>
-            <button className="refresh-api-btn" onClick={fetchLiveBooks} title="Refresh API data">
+            <span>{isLiveApi ? "Gutendex Live" : "Offline Data"}</span>
+            <button className="refresh-api-btn" onClick={() => fetchLiveBooks()} title="Refresh API data">
               <RefreshCw size={12} className={loading ? "spin" : ""} />
             </button>
           </div>
@@ -252,7 +285,7 @@ function BookList({ searchItem, showWishlistOnly, setShowWishlistOnly }) {
       {/* Results Status */}
       <div className="results-status-row">
         <span className="results-count">
-          Showing <strong>{filteredBooks.length}</strong> {filteredBooks.length === 1 ? "book" : "books"}
+          Showing <strong>{paginatedBooks.length}</strong> of <strong>{filteredBooks.length}</strong> {filteredBooks.length === 1 ? "book" : "books"}
           {showWishlistOnly && " in your Favorites"}
           {selectedCategory !== "All" && ` under ${selectedCategory}`}
           {searchItem && ` matching "${searchItem}"`}
@@ -283,8 +316,8 @@ function BookList({ searchItem, showWishlistOnly, setShowWishlistOnly }) {
       ) : (
         <motion.div layout className="book-grid">
           <AnimatePresence mode="popLayout">
-            {filteredBooks.length > 0 ? (
-              filteredBooks.map((book) => (
+            {paginatedBooks.length > 0 ? (
+              paginatedBooks.map((book) => (
                 <motion.div
                   key={book.id}
                   layout
@@ -314,6 +347,52 @@ function BookList({ searchItem, showWishlistOnly, setShowWishlistOnly }) {
             )}
           </AnimatePresence>
         </motion.div>
+      )}
+
+      {/* Pagination Bar */}
+      {!loading && totalPages > 1 && (
+        <div className="pagination-bar">
+          <button
+            className="pagination-btn"
+            disabled={currentPage === 1}
+            onClick={() => {
+              setCurrentPage((prev) => Math.max(1, prev - 1));
+              window.scrollTo({ top: 300, behavior: "smooth" });
+            }}
+            aria-label="Previous Page"
+          >
+            <ChevronLeft size={18} />
+            <span>Previous</span>
+          </button>
+
+          <div className="pagination-pages">
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNum) => (
+              <button
+                key={pageNum}
+                className={`pagination-num-btn ${currentPage === pageNum ? "active" : ""}`}
+                onClick={() => {
+                  setCurrentPage(pageNum);
+                  window.scrollTo({ top: 300, behavior: "smooth" });
+                }}
+              >
+                {pageNum}
+              </button>
+            ))}
+          </div>
+
+          <button
+            className="pagination-btn"
+            disabled={currentPage === totalPages}
+            onClick={() => {
+              setCurrentPage((prev) => Math.min(totalPages, prev + 1));
+              window.scrollTo({ top: 300, behavior: "smooth" });
+            }}
+            aria-label="Next Page"
+          >
+            <span>Next</span>
+            <ChevronRight size={18} />
+          </button>
+        </div>
       )}
     </section>
   );

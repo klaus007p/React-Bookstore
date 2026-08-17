@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Star, ShoppingBag, Heart, BookOpen, Calendar, Layers, ExternalLink } from "lucide-react";
 import { useCart } from "../context/CartContext";
@@ -7,20 +7,28 @@ const QuickViewModal = () => {
   const { quickViewBook, setQuickViewBook, addToCart, isWishlisted, toggleWishlist } = useCart();
   const [qty, setQty] = useState(1);
 
-  if (!quickViewBook) return null;
+  useEffect(() => {
+    if (quickViewBook) setQty(1);
+  }, [quickViewBook]);
 
-  const favorited = isWishlisted(quickViewBook.id);
-
-  const handleAddToCart = () => {
-    addToCart(quickViewBook, qty);
+  const closeModal = () => {
     setQuickViewBook(null);
     setQty(1);
+  };
+
+  const favorited = quickViewBook ? isWishlisted(quickViewBook.id) : false;
+
+  const handleAddToCart = () => {
+    if (quickViewBook) {
+      addToCart(quickViewBook, qty);
+      closeModal();
+    }
   };
 
   return (
     <AnimatePresence>
       {quickViewBook && (
-        <div className="modal-backdrop" onClick={() => setQuickViewBook(null)}>
+        <div className="modal-backdrop" onClick={closeModal}>
           <motion.div
             initial={{ opacity: 0, scale: 0.9, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -31,7 +39,7 @@ const QuickViewModal = () => {
           >
             <button
               className="modal-close-btn"
-              onClick={() => setQuickViewBook(null)}
+              onClick={closeModal}
               aria-label="Close details"
             >
               <X size={20} />

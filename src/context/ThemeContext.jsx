@@ -28,6 +28,7 @@ export const ThemeProvider = ({ children }) => {
         const handleKeyDown = (e) => {
             const tag = e.target.tagName ? e.target.tagName.toLowerCase() : '';
             if (tag === 'input' || tag === 'textarea' || e.target.isContentEditable) return;
+            if (e.ctrlKey || e.metaKey || e.altKey) return;
             if (e.key.toLowerCase() === 't') {
                 toggleTheme();
             }
